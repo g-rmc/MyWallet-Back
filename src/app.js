@@ -1,47 +1,90 @@
 import express from 'express';
 import cors from 'cors';
-import { Db, MongoClient, ObjectId } from 'mongodb';
-import dotenv from 'dotenv';
+
 import joi from 'joi';
 import { stripHtml } from 'string-strip-html';
 import bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
-dotenv.config();
+import { db } from './database/db.js';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-//const mongoClient = new MongoClient(process.env.MONGO_URI);
-//let db;
-//mongoClient.connect(() => { db = mongoClient.db("my-wallet")})
+const newUserSchema = joi.object({
+    name: joi.string().trim().min(3).required(),
+    email: joi.string().trim().email().required(),
+    password: joi.string().trim().min(5).required(),
+    passwordConfirmation: joi.string().trim().valid(joi.ref('password')).required(),
+    hashPassword: joi.any()
+})
 
-//const nameSchema = joi.object({ parâmetro: requisitos() })
+const userLoginSchema = joi.object({
+    email: joi.string().trim().email().required(),
+    password: joi.string().trim().min(5).required()
+})
 
-//const hashPassword = bcrypt.hashSync(password, 10);
 //const validate = bcrypt.compareSync(password, hash);
 
-//const token = uuidv4();
+app.post('/sign-up', async (req, res) => {
+    const { name, email, password, passwordConfirmation } = req.body;
 
-app.post('/login'), async (req, res) => {
-    const { email, password } = req.body;
+    const newUser = { name, email, password, passwordConfirmation, hashPassword: ''};
+    const validation = newUserSchema.validate(newUser);
 
-    //const user = await db.collection('users').findOne({ email });
+    if (validation.error) {
+        return res.status(422).send(validation.error.details.map(err => err.message));
+    }
 
-    //if (user && bcrypt.compareSync(password, user.password)) {
+    newUser.name = stripHtml(name).result;
+    newUser.email = stripHtml(email).result;
+    newUser.hashPassword = bcrypt.hashSync(password, 10);
+    delete newUser.password;
+    delete newUser.passwordConfirmation;
 
-        const token = uuid();
+    try {
+        const isValidEmail = await db.collection('users').findOne({email});
+        if (isValidEmail) {
+            return res.status(422).send('E-mail já cadastrado!');
+        }
+    } catch (error) {
+        return res.status(500).send(error);
+    }
 
-        //await db.collection('sessions').insertOne({
-            //userId: user._id,
-            //token
-        //})
+    try {
+        await db.collection('users').insertOne(newUser);
+        res.sendStatus(201);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+})
 
-        res.send(token);
-    //} else {
-        //res.sendStatus(401);
-    //}
-}
+app.post('/sign-in', async (req, res) => {
+    let { email, password } = req.body;
+
+    email = stripHtml(email).result;
+    password = stripHtml(password).result;
+
+    try {
+        const user = await db.collection('users').findOne({ email });
+
+        if (user && bcrypt.compareSync(password, user.password)) {
+    
+            const token = uuid();
+    
+            await db.collection('sessions').insertOne({
+                userId: user._id,
+                token
+            })
+    
+            res.send(token);
+        } else {
+            res.sendStatus(401);
+        }
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+})
 
 app.listen('5000', () => console.log('Listening on 5000'))
