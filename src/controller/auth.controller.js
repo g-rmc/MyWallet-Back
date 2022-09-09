@@ -14,8 +14,8 @@ const newUserSchema = joi.object({
 })
 
 const userLoginSchema = joi.object({
-    email: joi.string().trim().email().required(),
-    password: joi.string().trim().min(5).required()
+    email: joi.string().trim().required(),
+    password: joi.string().trim().required()
 })
 
 async function createNewUser (req, res) {
