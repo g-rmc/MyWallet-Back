@@ -25,8 +25,6 @@ const userLoginSchema = joi.object({
     password: joi.string().trim().min(5).required()
 })
 
-//const validate = bcrypt.compareSync(password, hash);
-
 app.post('/sign-up', async (req, res) => {
 
     const { name, email, password, passwordConfirmation } = req.body;
@@ -64,22 +62,41 @@ app.post('/sign-up', async (req, res) => {
 app.post('/sign-in', async (req, res) => {
     let { email, password } = req.body;
 
+    const validation = userLoginSchema.validate({email, password});
+
+    if (validation.error) {
+        return res.status(422).send(validation.error.details.map(err => err.message));
+    }
+
     email = stripHtml(email).result;
     password = stripHtml(password).result;
 
     try {
         const user = await db.collection('users').findOne({ email });
 
-        if (user && bcrypt.compareSync(password, user.password)) {
+        console.log("1...")
+
+        if (user && bcrypt.compareSync(password, user.hashPassword)) {
     
             const token = uuid();
+
+            console.log("2...")
     
             await db.collection('sessions').insertOne({
                 userId: user._id,
                 token
             })
+
+            console.log("3...")
+
+            const userInfo = {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                token
+            }
     
-            res.send(token);
+            res.send(userInfo);
         } else {
             res.sendStatus(401);
         }
