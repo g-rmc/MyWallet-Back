@@ -15,7 +15,7 @@ app.use(express.json());
 const newUserSchema = joi.object({
     name: joi.string().trim().min(3).required(),
     email: joi.string().trim().email().required(),
-    password: joi.string().trim().min(5).required(),
+    password: joi.string().trim().min(6).required(),
     passwordConfirmation: joi.string().trim().valid(joi.ref('password')).required(),
     hashPassword: joi.any()
 })
@@ -28,6 +28,7 @@ const userLoginSchema = joi.object({
 //const validate = bcrypt.compareSync(password, hash);
 
 app.post('/sign-up', async (req, res) => {
+
     const { name, email, password, passwordConfirmation } = req.body;
 
     const newUser = { name, email, password, passwordConfirmation, hashPassword: ''};
