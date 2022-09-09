@@ -46,9 +46,9 @@ async function createNewUser (req, res) {
 
     try {
         await db.collection('users').insertOne(newUser);
-        res.sendStatus(201);
+        return res.sendStatus(201);
     } catch (error) {
-        res.status(500).send(error);
+        return res.status(500).send(error);
     }
 }
 
@@ -83,9 +83,9 @@ async function userLogin (req, res) {
                 token
             }
     
-            res.send(userInfo);
+            return res.send(userInfo);
         } else {
-            res.sendStatus(401);
+            return res.sendStatus(401);
         }
     } catch (error) {
         return res.status(500).send(error);

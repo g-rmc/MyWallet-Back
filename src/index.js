@@ -1,13 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 
-import { createNewUser, userLogin } from './controller/auth.controller.js';
+import authRouter from './routers/auth.router.js';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.post('/auth/sign-up', createNewUser)
-app.post('/auth/sign-in', userLogin)
+app.use(authRouter);
 
 app.listen('5000', () => console.log('Listening on 5000'))
