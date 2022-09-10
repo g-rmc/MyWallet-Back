@@ -13,8 +13,14 @@ const newRegisterSchema = joi.object({
 
 async function getUserRegisters(req,res) {
 
-    console.log('Foi aqui')
-    res.sendStatus(200);
+    const userId = res.locals.userId.toString();
+
+    try {
+        const registers = await db.collection('register').find({userId}).toArray();
+        return res.send(registers);
+    } catch (error) {
+        return res.status(500).send(error);
+    }
 }
 
 async function createRegister(req,res) {
