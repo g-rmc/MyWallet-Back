@@ -9,8 +9,7 @@ const newUserSchema = joi.object({
     name: joi.string().trim().min(3).required(),
     email: joi.string().trim().email().required(),
     password: joi.string().trim().min(6).required(),
-    passwordConfirmation: joi.string().trim().valid(joi.ref('password')).required(),
-    hashPassword: joi.any()
+    passwordConfirmation: joi.string().trim().valid(joi.ref('password')).required()
 })
 
 const userLoginSchema = joi.object({
@@ -22,18 +21,17 @@ async function createNewUser (req, res) {
 
     const { name, email, password, passwordConfirmation } = req.body;
 
-    const newUser = { name, email, password, passwordConfirmation, hashPassword: ''};
-    const validation = newUserSchema.validate(newUser);
+    const validation = newUserSchema.validate({ name, email, password, passwordConfirmation});
 
     if (validation.error) {
         return res.status(422).send(validation.error.details.map(err => err.message));
     }
 
-    newUser.name = stripHtml(name).result;
-    newUser.email = stripHtml(email).result;
-    newUser.hashPassword = bcrypt.hashSync(password, 10);
-    delete newUser.password;
-    delete newUser.passwordConfirmation;
+    const newUser = {
+        name: stripHtml(name).result,
+        email: stripHtml(email).result,
+        hashPassword: bcrypt.hashSync(password, 10)
+    }
 
     try {
         const isValidEmail = await db.collection('users').findOne({email});
