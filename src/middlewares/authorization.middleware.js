@@ -1,4 +1,4 @@
-import { db } from "../database/db.js";
+import { db } from "../db/db.js";
 
 async function userAuthorization(req, res, next){
     const { authorization } = req.headers;

@@ -1,15 +1,9 @@
 import express from "express";
 import dayjs from "dayjs";
-import joi from "joi";
 import { stripHtml } from 'string-strip-html';
-import { db } from "../database/db.js";
 
-const newRegisterSchema = joi.object({
-    userId: joi.string().required(),
-    type: joi.string().valid('positive', 'negative').required(),
-    name: joi.string().trim().min(1).required(),
-    value: joi.number().required()
-})
+import { db } from "../db/db.js";
+import { newRegisterSchema } from '../schemas/newRegisterSchema.js'
 
 async function getUserRegisters(req,res) {
 
