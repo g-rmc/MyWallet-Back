@@ -1,5 +1,3 @@
-import express from "express";
-import dayjs from "dayjs";
 import { stripHtml } from 'string-strip-html';
 
 import { db } from "../db/db.js";
@@ -20,7 +18,6 @@ async function getUserRegisters(req,res) {
 async function createRegister(req,res) {
 
     const { userId, type, name, value } = req.body;
-    const date = dayjs().format('DD-MM').replace("-","/");
 
     const validation = newRegisterSchema.validate({userId, type, name, value});
     if (validation.error){
@@ -32,7 +29,7 @@ async function createRegister(req,res) {
         type,
         name: stripHtml(name).result,
         value: Number(value).toFixed(2),
-        date
+        date: new Date()
     }
 
     try {
