@@ -10,7 +10,7 @@ async function createNewUser (req, res) {
 
     const { name, email, password, passwordConfirmation } = req.body;
 
-    const validation = newUserSchema.validate({ name, email, password, passwordConfirmation});
+    const validation = newUserSchema.validate({ name, email, password, passwordConfirmation}, {abortEarly: false});
 
     if (validation.error) {
         return res.status(422).send(validation.error.details.map(err => err.message));
@@ -42,7 +42,7 @@ async function createNewUser (req, res) {
 async function userLogin (req, res) {
     let { email, password } = req.body;
 
-    const validation = userLoginSchema.validate({email, password});
+    const validation = userLoginSchema.validate({email, password}, {abortEarly: false});
 
     if (validation.error) {
         return res.status(422).send(validation.error.details.map(err => err.message));

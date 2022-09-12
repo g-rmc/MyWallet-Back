@@ -2,7 +2,8 @@ import { ObjectId } from 'mongodb';
 import { stripHtml } from 'string-strip-html';
 
 import { db } from "../db/db.js";
-import { newRegisterSchema } from '../schemas/newRegisterSchema.js'
+import { newRegisterSchema } from '../schemas/newRegisterSchema.js';
+import { updateRegisterSchema } from '../schemas/updateRegisterSchema.js';
 
 async function getUserRegisters(req,res) {
 
@@ -20,7 +21,7 @@ async function createRegister(req,res) {
 
     const { userId, type, name, value } = req.body;
 
-    const validation = newRegisterSchema.validate({userId, type, name, value});
+    const validation = newRegisterSchema.validate({userId, type, name, value}, {abortEarly: false});
     if (validation.error){
         return res.status(422).send(validation.error.details.map(err => err.message));
     }
@@ -44,13 +45,7 @@ async function createRegister(req,res) {
 async function deleteRegister(req,res) {
 
     const userId = res.locals.userId.toString();
-    const registerId = stripHtml(req.params.ID_REGISTER).result;
-
-    try {
-        ObjectId(registerId)
-    } catch (error) {
-        return res.status(422).send('id inválido')
-    }
+    const registerId = res.locals.registerId.toString();
 
     try {
         const register = await db.collection('register').findOne({$and: [{userId: userId},{_id: ObjectId(registerId)}]});
@@ -64,4 +59,35 @@ async function deleteRegister(req,res) {
     }
 }
 
-export { getUserRegisters, createRegister, deleteRegister };
+async function editRegister(req,res){
+
+    const userId = res.locals.userId.toString();
+    const registerId = res.locals.registerId.toString();
+    const { name, value } = req.body;
+
+    const validation = updateRegisterSchema.validate({ name, value}, {abortEarly: false});
+    if (validation.error){
+        return res.status(422).send(validation.error.details.map(err => err.message));
+    }
+
+    try {
+        const oldRegister = await db.collection('register').findOne({$and: [{userId: userId},{_id: ObjectId(registerId)}]});
+        if (!oldRegister){
+            return res.sendStatus(404);
+        }
+        const newRegister = {
+            ...oldRegister, 
+            name, 
+            value: Number(value).toFixed(2)
+        };
+        await db.collection('register').updateOne(
+            {$and: [{userId: userId},{_id: ObjectId(registerId)}]},
+            {$set: newRegister}
+        );
+        return res.sendStatus(200);
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+}
+
+export { getUserRegisters, createRegister, deleteRegister, editRegister };
