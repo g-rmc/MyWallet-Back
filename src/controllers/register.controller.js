@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import { stripHtml } from 'string-strip-html';
 
 import { db } from "../db/db.js";
@@ -40,4 +41,27 @@ async function createRegister(req,res) {
     }
 }
 
-export { getUserRegisters, createRegister };
+async function deleteRegister(req,res) {
+
+    const userId = res.locals.userId.toString();
+    const registerId = stripHtml(req.params.ID_REGISTER).result;
+
+    try {
+        ObjectId(registerId)
+    } catch (error) {
+        return res.status(422).send('id inválido')
+    }
+
+    try {
+        const register = await db.collection('register').findOne({$and: [{userId: userId},{_id: ObjectId(registerId)}]});
+        if (!register){
+            return res.sendStatus(404);
+        }
+        await db.collection('register').deleteOne({$and: [{userId: userId},{_id: ObjectId(registerId)}]});
+        return res.sendStatus(200);
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+}
+
+export { getUserRegisters, createRegister, deleteRegister };
