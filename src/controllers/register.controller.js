@@ -42,6 +42,22 @@ async function createRegister(req,res) {
     }
 }
 
+async function getRegisterById(req, res) {
+
+    const userId = res.locals.userId.toString();
+    const registerId = res.locals.registerId.toString();
+
+    try {
+        const register = await db.collection('register').findOne({$and: [{userId: userId},{_id: ObjectId(registerId)}]});
+        if (!register){
+            return res.sendStatus(404);
+        }
+        return res.send(register);
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+}
+
 async function deleteRegister(req,res) {
 
     const userId = res.locals.userId.toString();
@@ -90,4 +106,4 @@ async function editRegister(req,res){
     }
 }
 
-export { getUserRegisters, createRegister, deleteRegister, editRegister };
+export { getUserRegisters, createRegister, getRegisterById, deleteRegister, editRegister };

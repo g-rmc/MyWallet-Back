@@ -1,6 +1,6 @@
 import express from "express";
 
-import { getUserRegisters, createRegister, deleteRegister, editRegister } from "../controllers/register.controller.js";
+import { getUserRegisters, createRegister, getRegisterById, deleteRegister, editRegister } from "../controllers/register.controller.js";
 import { userAuthorization } from "../middlewares/authorization.middleware.js";
 import { auditRegister } from "../middlewares/auditRegister.middleware.js";
 
@@ -10,6 +10,7 @@ router.use(userAuthorization);
 
 router.get('/register', getUserRegisters);
 router.post('/register', createRegister);
+router.get('/register/:ID_REGISTER', auditRegister, getRegisterById);
 router.delete('/register/:ID_REGISTER', auditRegister, deleteRegister);
 router.put('/register/:ID_REGISTER', auditRegister, editRegister);
 
