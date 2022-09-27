@@ -15,7 +15,6 @@ async function createNewUser (req, res) {
     if (validation.error) {
         return res.status(422).send(validation.error.details.map(err => err.message));
     }
-
     const newUser = {
         name: stripHtml(name).result,
         email: stripHtml(email).result,
