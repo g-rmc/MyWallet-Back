@@ -2,8 +2,8 @@ import { ObjectId } from 'mongodb';
 import { stripHtml } from 'string-strip-html';
 
 import { db } from "../db/db.js";
-import { newRegisterSchema } from '../schemas/newRegisterSchema.js';
-import { updateRegisterSchema } from '../schemas/updateRegisterSchema.js';
+import { newRegisterSchema } from '../schemas/newTransactionSchema.js';
+import { updateRegisterSchema } from '../schemas/updateTransactionSchema.js';
 
 async function getUserRegisters(req,res) {
 

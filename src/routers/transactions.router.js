@@ -1,8 +1,8 @@
 import express from "express";
 
-import { getUserRegisters, createRegister, getRegisterById, deleteRegister, editRegister } from "../controllers/register.controller.js";
+import { getUserRegisters, createRegister, getRegisterById, deleteRegister, editRegister } from "../controllers/transaction.controller.js";
 import { userAuthorization } from "../middlewares/authorization.middleware.js";
-import { auditRegister } from "../middlewares/auditRegister.middleware.js";
+import { auditRegister } from "../middlewares/auditTransaction.middleware.js";
 
 const router = express.Router();
 
