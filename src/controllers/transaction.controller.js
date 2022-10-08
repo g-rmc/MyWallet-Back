@@ -13,7 +13,7 @@ async function getUserRegisters(req,res) {
         const registers = await db.collection('register').find({userId}).toArray();
         return res.send(registers);
     } catch (error) {
-        return res.status(500).send(error);
+        return res.sendStatus(500);
     }
 }
 
@@ -38,7 +38,7 @@ async function createRegister(req,res) {
         await db.collection('register').insertOne(newRegister);
         return res.sendStatus(201);
     } catch (error) {
-        return res.status(500).send(error);
+        return res.sendStatus(500);
     }
 }
 
@@ -54,7 +54,7 @@ async function getRegisterById(req, res) {
         }
         return res.send(register);
     } catch (error) {
-        return res.status(500).send(error);
+        return res.res.sendStatus(500);
     }
 }
 
@@ -71,7 +71,7 @@ async function deleteRegister(req,res) {
         await db.collection('register').deleteOne({$and: [{userId: userId},{_id: ObjectId(registerId)}]});
         return res.sendStatus(200);
     } catch (error) {
-        return res.status(500).send(error);
+        return res.sendStatus(500);
     }
 }
 
@@ -102,7 +102,7 @@ async function editRegister(req,res){
         );
         return res.sendStatus(200);
     } catch (error) {
-        return res.status(500).send(error);
+        return res.sendStatus(500);
     }
 }
 

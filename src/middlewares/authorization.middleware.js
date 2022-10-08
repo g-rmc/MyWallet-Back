@@ -17,7 +17,7 @@ async function userAuthorization(req, res, next){
         res.locals.userId = session.userId;
 
     } catch (error) {    
-        return res.status(500).send(error);
+        return res.sendStatus(500);
     }
 
     next();

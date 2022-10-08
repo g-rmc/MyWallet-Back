@@ -27,14 +27,14 @@ async function createNewUser (req, res) {
             return res.status(422).send('E-mail já cadastrado!');
         }
     } catch (error) {
-        return res.status(500).send(error);
+        return res.status(500);
     }
 
     try {
         await db.collection('users').insertOne(newUser);
         return res.sendStatus(201);
     } catch (error) {
-        return res.status(500).send(error);
+        return res.status(500);
     }
 }
 
@@ -74,7 +74,7 @@ async function userLogin (req, res) {
             return res.sendStatus(401);
         }
     } catch (error) {
-        return res.status(500).send(error);
+        return res.sendStatus(500);
     }
 }
 
